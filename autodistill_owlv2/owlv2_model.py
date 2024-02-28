@@ -34,14 +34,14 @@ class OWLv2(DetectionBaseModel):
         )
         self.model = Owlv2ForObjectDetection.from_pretrained(
             "google/owlv2-base-patch16-ensemble"
-        )
+        ).to(DEVICE)
         self.ontology = ontology
 
     def predict(self, input: Any, confidence: int = 0.1) -> sv.Detections:
         image = load_image(input, return_format="PIL")
         texts = [self.ontology.prompts()]
 
-        inputs = self.processor(text=texts, images=image, return_tensors="pt")
+        inputs = self.processor(text=texts, images=image, return_tensors="pt").to(DEVICE)
         outputs = self.model(**inputs)
 
         target_sizes = torch.Tensor([image.size[::-1]])
